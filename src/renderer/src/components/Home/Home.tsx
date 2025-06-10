@@ -18,7 +18,6 @@ interface DecodedToken {
 const Home: React.FC = () => {
 
     const {totalMessages} = useMessages();
-    console.log('inside home messages', totalMessages); 
     
 
     const [token, setToken] = useState<DecodedToken | null>(null);
@@ -27,13 +26,11 @@ const Home: React.FC = () => {
     const location = useLocation();
 
     const { data: users = [] } = useGetUsers();
-    console.log(users);
 
 
     const getToken = async () => {
         try {
             const fetchedToken = await window.electron.ipcRenderer.invoke('get-token');
-            console.log('fetched token, ', fetchedToken);
             const decoded: DecodedToken = jwtDecode(fetchedToken.idToken);
             userId.current = fetchedToken.id;
             setToken(decoded);

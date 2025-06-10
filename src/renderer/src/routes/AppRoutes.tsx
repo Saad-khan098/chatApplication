@@ -6,6 +6,8 @@ import ProtectedRoute from './ProtectedRoute';
 import Home from '@renderer/components/Home/Home';
 import Message from '@renderer/components/Message/Message';
 import { MessageProvider } from '@renderer/utils/Message/MessageContext';
+import { GroupMessageProvider } from '@renderer/utils/Message/GroupMessageContext';
+import Groups from '@renderer/components/Groups/Groups';
 const AppRoutes = () => {
   return (
     <Routes>
@@ -13,17 +15,15 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/home" element={
         <ProtectedRoute>
-          <MessageProvider>
-            <Home />
-          </MessageProvider>
+          <GroupMessageProvider>
+            <MessageProvider>
+              <Home />
+            </MessageProvider>
+          </GroupMessageProvider>
         </ProtectedRoute>
       }>
         <Route path="message/:id" element={<Message />} />
-
-        {/* <Route index element={<Dashboard />} /> 
-                    <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="profile" element={<Profile />} />
-                    <Route path="settings" element={<Settings />} /> */}
+        <Route path="groups" element={<Groups />} />
       </Route>
     </Routes>
   );

@@ -21,9 +21,6 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ currentPath, users, messages, userId }) => {
-    console.log('sidebar messages', messages);
-    console.log('sidebar users', users);
-
     const navigate = useNavigate();
 
     const goToMessage = (name: string, id: string) => {
@@ -36,7 +33,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPath, users, messages, userId 
 
     const menuItems = [
         { path: '/home/groups', label: 'Groups', icon: <GroupIcon /> },
-        { path: '/home/messages', label: 'Messages', icon: <ChatBubbleIcon /> },
+        { path: '#', label: 'Messages', icon: <ChatBubbleIcon /> },
     ];
 
     return (

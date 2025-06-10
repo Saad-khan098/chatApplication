@@ -27,41 +27,40 @@ type MessageContextType = {
     markMessagesAsRead: (senderId: string) => void;
 };
 
-const MessageContext = createContext<MessageContextType | undefined>(undefined);
-export const useMessages = () => useContext(MessageContext)!;
+const GroupMessageContext = createContext<MessageContextType | undefined>(undefined);
+export const useGroupMessages = () => useContext(GroupMessageContext)!;
 
-export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const GroupMessageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [totalMessages, settotalMessages] = useState();
     const [messages, setMessages] = useState<MessageMap>({});
     
-    // Use refs to track registration state and socket instance
     const socketRef = useRef(null);
     const isRegisteredRef = useRef(false);
     const isInitializedRef = useRef(false);
 
-    const addMessage = (chatId: string, message: Message) => {
-        console.log('adding message', chatId, message);
+    const addMessage = (groupId: string, message: Message) => {
+        console.log('adding a new message', message.group_id, message);
         setMessages(prev => ({
             ...prev,
-            [chatId]: [...(prev[chatId] || []), message]
+            [message.group_id]: [...(prev[message.group_id] || []), message]
         }));
 
         settotalMessages((prev: any) =>
             prev ? prev.map(entry =>
-                entry.chat_id === chatId
-                    ? { ...entry, content: message.content, unread_count: 0 }
+                entry.chat_id === groupId
+                    ? { ...entry, content: message.content }
                     : entry
             ) : prev
         );
     };
 
-    const fetchMessagesForChat = async (chatId: string) => {
+    const fetchMessagesForChat = async (groupId: string) => {
         let token = await window.electron.ipcRenderer.invoke('get-token');
 
         if (!token) throw new Error('No auth token found');
 
         try {
-            const res = await fetch(`${apiUrl}/messages/${chatId}`, {
+            const res = await fetch(`${apiUrl}/groups/chat/${groupId}`, {
                 headers: {
                     Authorization: `Bearer ${token.idToken}`,
                     'x-user-id': token.id,
@@ -70,7 +69,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const data = await res.json();
             setMessages(prev => ({
                 ...prev,
-                [chatId]: data.messages || [],
+                [groupId]: data || [],
             }));
         } catch (err) {
             console.error("Failed to fetch messages:", err);
@@ -78,22 +77,22 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
 
     const fetchMessages = async () => {
-        let token = await window.electron.ipcRenderer.invoke('get-token');
+        // let token = await window.electron.ipcRenderer.invoke('get-token');
 
-        if (!token) throw new Error('No auth token found');
+        // if (!token) throw new Error('No auth token found');
 
-        try {
-            const res = await fetch(`${apiUrl}/messages/`, {
-                headers: {
-                    Authorization: `Bearer ${token.idToken}`,
-                    'x-user-id': token.id,
-                },
-            });
-            const data = await res.json();
-            settotalMessages(data.inbox);
-        } catch (err) {
-            console.error("Failed to fetch messages:", err);
-        }
+        // try {
+        //     const res = await fetch(`${apiUrl}/messages/`, {
+        //         headers: {
+        //             Authorization: `Bearer ${token.idToken}`,
+        //             'x-user-id': token.id,
+        //         },
+        //     });
+        //     const data = await res.json();
+        //     settotalMessages(data.inbox);
+        // } catch (err) {
+        //     console.error("Failed to fetch messages:", err);
+        // }
     };
 
     const registerUser = async () => {
@@ -117,42 +116,42 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const sendMessage = (message: Message) => {
         if (socketRef.current) {
-            socketRef.current.emit("send_message", message);
+            socketRef.current.emit("group_send_message", message);
             addMessage(message.chatId, { ...message });
         }
     };
 
     const markMessagesAsRead = async (senderId: string) => {
-        try {
-            const token = await window.electron.ipcRenderer.invoke('get-token');
-            const receiverId = token.id;
+        // try {
+        //     const token = await window.electron.ipcRenderer.invoke('get-token');
+        //     const receiverId = token.id;
 
-            if (socketRef.current) {
-                socketRef.current.emit("status_update", {
-                    senderId,
-                    receiverId
-                });
-            }
+        //     if (socketRef.current) {
+        //         socketRef.current.emit("status_update", {
+        //             senderId,
+        //             receiverId
+        //         });
+        //     }
 
-            const chatId = [receiverId, senderId].sort().join('-');
+        //     const chatId = [receiverId, senderId].sort().join('-');
 
-            settotalMessages((prev: any) => {
-                if (!prev) return prev;
+        //     settotalMessages((prev: any) => {
+        //         if (!prev) return prev;
 
-                return prev.map(entry => {
-                    if (entry.chat_id == chatId) {
-                        return {
-                            ...entry,
-                            unread_count: 0,
-                        };
-                    }
-                    return entry;
-                });
-            });
+        //         return prev.map(entry => {
+        //             if (entry.chat_id == chatId) {
+        //                 return {
+        //                     ...entry,
+        //                     unread_count: 0,
+        //                 };
+        //             }
+        //             return entry;
+        //         });
+        //     });
 
-        } catch (err) {
-            console.error("Failed to emit status update:", err);
-        }
+        // } catch (err) {
+        //     console.error("Failed to emit status update:", err);
+        // }
     };
 
     // Initialize socket connection and event listeners once
@@ -194,7 +193,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ child
         socket.on('connect', handleConnect);
         socket.on('disconnect', handleDisconnect);
         socket.on('connect_error', handleConnectError);
-        socket.on("new_message", handleNewMessage);
+        socket.on("new_group_message", handleNewMessage);
 
         // If already connected, register immediately
         if (socket.connected) {
@@ -210,7 +209,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ child
             socket.off('connect', handleConnect);
             socket.off('disconnect', handleDisconnect);
             socket.off('connect_error', handleConnectError);
-            socket.off("new_message", handleNewMessage);
+            socket.off("new_group_message", handleNewMessage);
             socket.disconnect();
             socketRef.current = null;
             isRegisteredRef.current = false;
@@ -219,7 +218,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }, []); // Empty dependency array ensures this runs only once
 
     return (
-        <MessageContext.Provider value={{ 
+        <GroupMessageContext.Provider value={{ 
             messages, 
             addMessage, 
             fetchMessagesForChat, 
@@ -228,6 +227,6 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ child
             markMessagesAsRead 
         }}>
             {children}
-        </MessageContext.Provider>
+        </GroupMessageContext.Provider>
     );
 };

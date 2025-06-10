@@ -3,6 +3,9 @@ import styles from './Signup.module.scss';
 import { useMutation } from '@tanstack/react-query';
 import SuccessAlert from '../HelperComponents/SuccessAlert';
 
+const apiUrl = import.meta.env.VITE_BASE_BACKEND_URL;
+
+
 type Props = {
     close: () => void;
 };
@@ -38,7 +41,7 @@ const SignupForm: React.FC<Props> = ({ close }) => {
 
     const signupMutation = useMutation({
         mutationFn: async (formData: FormData) => {
-            const res = await fetch('http://localhost:5000/auth/signup', {
+            const res = await fetch(`${apiUrl}/auth/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -47,7 +50,6 @@ const SignupForm: React.FC<Props> = ({ close }) => {
                     name: formData.displayName
                 }),
             });
-            console.log(res);
 
             if (!res.ok) {
                 const error = await res.json();

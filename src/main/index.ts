@@ -8,7 +8,10 @@ const { default: Store } = require('electron-store');
 const userIdArg = process.argv[2] || 'default';
 app.setPath('userData', join(app.getPath('userData'), userIdArg));
 
-const store = new Store();
+const store = new Store({
+  name: '1'
+}
+);
 
 
 
@@ -22,6 +25,8 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
       sandbox: false
     }
   })
@@ -59,13 +64,12 @@ app.whenReady().then(() => {
   })
 
   // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
 
   ipcMain.handle('save-token', (_event, token) => {
     store.set('authToken', token);
     return true; // Optional: confirm success
   });
-   ipcMain.handle('get-token', () => {
+  ipcMain.handle('get-token', () => {
     return store.get('authToken');
   });
 

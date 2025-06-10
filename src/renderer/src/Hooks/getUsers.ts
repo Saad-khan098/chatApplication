@@ -1,6 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from './useAuth';
 
+
+const apiUrl = import.meta.env.VITE_BASE_BACKEND_URL;
+
 // Define the shape of a user object
 export interface User {
   id: string;
@@ -15,7 +18,7 @@ const fetchUsers = async (): Promise<User[]> => {
     throw new Error('No auth token found');
   }
 
-  const response = await fetch('http://localhost:5000/users/getAllUsers', {
+  const response = await fetch(`${apiUrl}/users/getAllUsers`, {
     headers: {
       Authorization: `Bearer ${token.idToken}`,
       'x-user-id': token.id,

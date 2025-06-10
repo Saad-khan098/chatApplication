@@ -3,6 +3,8 @@ import styles from './Signup.module.scss'; // can be renamed later if you want
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+const apiUrl = import.meta.env.VITE_BASE_BACKEND_URL;
+
 
 type Props = {
     close: () => void;
@@ -25,13 +27,11 @@ const LoginForm: React.FC<Props> = ({ close }) => {
     const [errorMessage, setErrorMessage] = useState('');
 
     const handleSuccess = async (data: any) => {
-        console.log('Login success:', data);
 
 
         const token = {idToken: data.idToken, id: data.internalUserId};
         try {
             await window.electron.ipcRenderer.invoke('save-token', token);
-            console.log('Token saved securely.');
             navigate('/home');
 
         } catch (error) {
@@ -45,7 +45,7 @@ const LoginForm: React.FC<Props> = ({ close }) => {
 
     const loginMutation = useMutation({
         mutationFn: async (formData: FormData) => {
-            const res = await fetch('http://localhost:5000/auth/login', {
+            const res = await fetch(`${apiUrl}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
