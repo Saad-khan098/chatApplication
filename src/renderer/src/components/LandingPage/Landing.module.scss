@@ -1,0 +1,143 @@
+@import '../../styles/variables';
+
+main {
+    background-color: $background-color;
+
+
+    .popupOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+
+        .popupContent {
+            background: #fff;
+            // padding: 2rem;
+            border-radius: 10px;
+            position: relative;
+            width: 400px;
+            max-width: 90%;
+        }
+    }
+
+
+    nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        padding: 20px 0 20px 0;
+
+        .content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 80%;
+            max-width: 1300px;
+
+            .logo {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0px;
+
+                h2 {
+                    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+                    color: $primary-color;
+                    font-size: 45px;
+                }
+
+                img {
+                    width: 40px;
+                }
+            }
+
+
+            .links {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 35px;
+
+                a {
+                    text-decoration: none;
+                    color: $primary-color;
+                    font-weight: 600;
+                    font-family: 'Arial';
+
+                }
+
+                a.butt {
+                    background-color: $primary-color;
+                    color: $background-color;
+                    padding: 10px 15px 10px 15px;
+                    border-radius: 10px;
+                }
+            }
+
+        }
+    }
+
+    section.section1 {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 50px;
+        max-width: 1200px;
+        margin: auto;
+
+        .left {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            // align-items: center;
+            padding: 40px;
+
+            h1 {
+                font-size: 45px;
+                font-family: $font-family-heading;
+                color: $primary-color
+            }
+
+            p {
+                font-family: $font-size-base;
+                font-size: 22px;
+                line-height: 1.4;
+                margin-top: 20px;
+                color: $primary-color
+            }
+
+            .authButtons {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                margin-top: 30px;
+
+                a {
+                    padding: 10px 40px 10px 40px;
+                    text-decoration: none;
+                    border-radius: 10px;
+                    font-family: $font-size-base;
+                }
+
+                .filled {
+                    background-color: $primary-color;
+                    color: $background-color
+                }
+
+                .outline {
+                    border: solid $primary-color 1px;
+                    box-sizing: border-box;
+                    color: $primary-color;
+                }
+            }
+        }
+    }
+}
